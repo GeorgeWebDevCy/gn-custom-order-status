@@ -61,3 +61,14 @@ function GNCUSTOMOR() {
 }
 
 GNCUSTOMOR();
+require 'plugin-update-checker/plugin-update-checker.php';
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
+$myUpdateChecker = PucFactory::buildUpdateChecker(
+	'https://github.com/GeorgeWebDevCy/gn-custom-order-status',
+	__FILE__,
+	'gn-custom-order-status'
+);
+
+//Set the branch that contains the stable release.
+$myUpdateChecker->setBranch('main');
