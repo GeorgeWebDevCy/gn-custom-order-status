@@ -1,0 +1,36 @@
+2023-11-24 15:55:55 - Order Status Change: Old Status - order-delivered, New Status - completed
+2023-11-24 15:56:05 - Order Status Change: Old Status - completed, New Status - order-delivered
+2023-11-24 15:59:53 - Order Status Change: Old Status - order-delivered, New Status - completed
+2023-11-24 16:00:01 - Order Status Change: Old Status - completed, New Status - order-delivered
+2023-11-24 16:01:04 - Order Status Change: Old Status - order-delivered, New Status - completed
+2023-11-24 16:01:18 - Order Status Change: Old Status - completed, New Status - order-delivered
+2023-11-24 16:08:06 - Order Status Change: Old Status - order-delivered, New Status - completed
+2023-11-24 16:08:14 - Order Status Change: Old Status - completed, New Status - order-delivered
+2023-11-24 16:11:29 - Order Status Change: Old Status - order-delivered, New Status - completed
+2023-11-24 16:11:49 - Order Status Change: Old Status - completed, New Status - order-delivered
+2023-11-24 16:11:50 - Order Delivered Email sent for Order ID: 3905
+2023-11-24 16:15:15 - Order Status Change: Old Status - order-delivered, New Status - completed
+2023-11-24 16:15:40 - Order Status Change: Old Status - completed, New Status - order-delivered
+2023-11-24 16:15:41 - Order Delivered Email sent for Order ID: 3905
+2023-11-24 16:23:46 - Order Status Change: Old Status - wc-order-delivered, New Status - wc-completed
+2023-11-24 16:23:56 - Order Status Change: Old Status - wc-completed, New Status - wc-order-delivered
+2023-11-24 16:23:56 - Entered Try: 3905
+2023-11-24 16:23:56 - Before Trigger: 3905
+2023-11-24 16:23:58 - After Trigger: 3905
+2023-11-24 16:23:58 - Order Delivered Email sent for Order ID: 3905
+2023-11-24 16:29:45 - Order Status Change: Old Status - wc-order-delivered, New Status - wc-completed
+2023-11-24 16:30:09 - Order Status Change: Old Status - wc-completed, New Status - wc-order-delivered
+2023-11-24 16:30:09 - Entered Try: 3905
+2023-11-24 16:30:09 - Before Trigger: 3905
+2023-11-24 16:30:10 - After Trigger: 3905
+2023-11-24 16:30:10 - Order Delivered Email sent for Order ID: 3905
+2023-11-24 16:32:35 - Order Status Change: Old Status - wc-order-delivered, New Status - wc-completed
+2023-11-24 16:32:43 - Order Status Change: Old Status - wc-completed, New Status - wc-order-delivered
+2023-11-24 16:32:43 - Entered Try: 3905
+2023-11-24 16:32:43 - Before Trigger: 3905
+2023-11-24 16:32:44 - After Trigger: 3905
+2023-11-24 16:32:44 - Order Delivered Email sent for Order ID: 3905
+2023-11-24 16:36:01 - Order Status Change: Old Status - wc-order-delivered, New Status - wc-completed
+2023-11-24 16:36:09 - Order Status Change: Old Status - wc-completed, New Status - wc-order-delivered
+2023-11-24 16:37:45 - Order Status Change: Old Status - order-delivered, New Status - completed
+2023-11-24 16:37:57 - Order Status Change: Old Status - completed, New Status - order-delivered
