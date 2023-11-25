@@ -52,10 +52,37 @@ function gncy_log_to_file( $message ) {
     file_put_contents( GNCUSTOMOR_LOG_FILE, date( 'Y-m-d H:i:s' ) . ' - ' . $message . PHP_EOL, FILE_APPEND );
 }
 
+function gncy_include_custom_email_class() {
+    if ( class_exists( 'WC_Email' ) && ! class_exists( 'WC_Email_Custom_Order_Delivered' ) ) {
+        // Try including the class file
+        require_once GNCUSTOMOR_PLUGIN_DIR . 'core/class-wc-email-custom-order-delivered.php';
+
+        // Add a filter to register the email class
+        add_filter( 'woocommerce_email_classes', 'gncy_add_custom_email_class' );
+
+        // If your email class is still not recognized, try delaying the registration
+        add_action('init', 'gncy_add_custom_email_class_late', 9999);
+    }
+}
+
+
+function gncy_add_custom_email_class( $email_classes ) {
+    $email_classes['WC_Email_Custom_Order_Delivered'] = new WC_Email_Custom_Order_Delivered();
+    return $email_classes;
+}
+
+// Late registration in case of issues
+function gncy_add_custom_email_class_late() {
+    add_filter( 'woocommerce_email_classes', 'gncy_add_custom_email_class' );
+}
+
 /**
  * Load the main class for the core functionality
  */
 require_once GNCUSTOMOR_PLUGIN_DIR . 'core/class-gn-custom-order-status.php';
+
+// Load the email class
+require_once GNCUSTOMOR_PLUGIN_DIR . 'core/class-wc-email-custom-order-delivered.php';
 
 /**
  * The main function to load the only instance
@@ -110,38 +137,49 @@ function gncy_add_custom_order_statuses( $order_statuses ) {
 
 // Send email on order status change to "Order Delivered"
 function gncy_send_order_delivered_email( $order_id, $old_status, $new_status, $order ) {
+    $new_status = 'wc-' . $new_status;
     gncy_log_to_file( 'Order Status Change: Old Status - ' . $old_status . ', New Status - ' . $new_status );
+    gncy_log_to_file( 'Order Details: ' . print_r( $order, true ) );
 
     if ( 'wc-order-delivered' === $new_status ) {
         $subject = 'Your Order is Delivered';
         $heading = 'Order Delivered';
         $message = 'Your order has been delivered. Thank you for shopping with us!';
 
-        // You can customize the email template as needed, including the text before the order table.
-        $email = WC()->mailer()->emails['WC_Email_Customer_Completed_Order'];
-        $email_heading = $email->get_option( 'heading', $heading );
-        $email_subject = $email->get_option( 'subject', $subject );
-
-        // Get the default message
-        $default_message = WC()->mailer()->wrap_message(
-            $email_heading,
-            $message . "\n\n" . '{order_table}',
-            $email->get_option( 'email_type' ),
-            $email->get_option( 'email_heading' )
-        );
+        // Your custom template file
+        $template = GNCUSTOMOR_PLUGIN_DIR . 'woocommerce/emails/custom-order-delivered.php';
 
         // Try to send the email and log errors if any
         try {
-            // Set the email content
-            $email->heading = $email_heading;
-            $email->subject = $email_subject;
-            $email->message = $default_message;
+            // Ensure the email class is loaded
+            gncy_include_custom_email_class();
 
-            // Send the email
-            $email->trigger( $order_id );
+            // You can use the WooCommerce email class to send the email
+            $email = WC()->mailer()->get_emails()['WC_Email_Custom_Order_Delivered'];
 
-            // Log a message to the custom log file
-            gncy_log_to_file( 'Order Delivered Email Triggered for Order ID: ' . $order_id );
+            // Check if the email class exists
+            if ($email) {
+                // Set the email content
+                $email->heading = $heading;
+                $email->subject = $subject;
+
+                // Load the custom template
+                ob_start();
+                include $template;
+                $wrapped_message = ob_get_clean();
+
+                // Set the email content
+                $email->message = $wrapped_message;
+
+                // Send the email
+                $email->trigger( $order_id );
+
+                // Log a message to the custom log file along with email content
+                gncy_log_to_file( 'Order Delivered Email Triggered for Order ID: ' . $order_id . ', Email Content: ' . $wrapped_message );
+            } else {
+                // Log an error if the email class is not found
+                gncy_log_to_file( 'Error: WC_Email_Custom_Order_Delivered class not found.' );
+            }
         } catch ( Exception $e ) {
             // Log the error message
             gncy_log_to_file( 'Error sending Order Delivered Email for Order ID ' . $order_id . ': ' . $e->getMessage() );
