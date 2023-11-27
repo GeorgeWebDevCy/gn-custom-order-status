@@ -5,13 +5,13 @@
  * @package       GNCUSTOMOR
  * @author        George Nicolaou
  * @license       gplv2
- * @version       1.0.0
+ * @version       1.0.1
  *
  * @wordpress-plugin
  * Plugin Name:   GN Custom Order Status
  * Plugin URI:    https://www.georgenicolaou.me/plugins/gn-custom-order-status
  * Description:   Add custom order status to woocommerce
- * Version:       1.0.0
+ * Version:       1.0.1
  * Author:        George Nicolaou
  * Author URI:    https://www.georgenicolaou.me/
  * Text Domain:   gn-custom-order-status
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 define( 'GNCUSTOMOR_NAME',			'GN Custom Order Status' );
 
 // Plugin version
-define( 'GNCUSTOMOR_VERSION',		'1.0.0' );
+define( 'GNCUSTOMOR_VERSION',		'1.0.1' );
 
 // Plugin Root File
 define( 'GNCUSTOMOR_PLUGIN_FILE',	__FILE__ );
@@ -116,14 +116,21 @@ function gncy_add_custom_order_status_to_dropdown( $order_statuses ) {
 	return $new_order_statuses;
 }
 add_filter( 'wc_order_statuses', 'gncy_add_custom_order_status_to_dropdown' );
-
-
-
   
 function gncy_change_woocommerce_strings_emails( $translated, $untranslated, $domain ) {
    if ( 'woocommerce' === $domain ) {   
-      $translated = str_ireplace( 'We have finished processing your order.', 'Your order has been delivered', $untranslated ); // EDIT
+      
+	  $translated = str_ireplace( '<p>Hold onto your excitement because your order is officially in transit to you! 🎉</p>
+	  <p>If your shipping includes a tracking number, find it below to follow your order\'s journey to your door.</p>
+	  <p>Now, let\'s address the elephant in the room - delays. Sometimes, despite our best efforts, orders like to take unexpected detours. But rest assured, your order will arrive eventually. We promise it\'s not plotting a grand escape 😋</p>
+	  <p>Kindly be aware that we operate multiple warehouses strategically located to improve efficiency and shipping times. Rest assured, your order will be dispatched from the most suitable warehouse at that specific moment.</p>
+	  <p>Please don’t hesitate to reach out to us at support@planetofgadgets.com, and we’ll do our utmost to resolve any concerns promptly and ensure you have a positive shopping experience with us. Your happiness is our priority.</p>
+	  <p>We greatly appreciate your trust in us. Your order is en route, and we can\'t wait for you to welcome it with open arms.</p>', 'test', $untranslated ); // EDIT
+
+	  $translated = str_ireplace( 'We have finished processing your order.', 'Your order has been delivered', $untranslated ); // EDIT
    }
+
+	  
    return $translated;
 }
 
