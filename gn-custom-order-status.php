@@ -5,13 +5,13 @@
  * @package       GNCUSTOMOR
  * @author        George Nicolaou
  * @license       gplv2
- * @version       1.0.1
+ * @version       1.0.2
  *
  * @wordpress-plugin
  * Plugin Name:   GN Custom Order Status
  * Plugin URI:    https://www.georgenicolaou.me/plugins/gn-custom-order-status
  * Description:   Add custom order status to woocommerce
- * Version:       1.0.1
+ * Version:       1.0.2
  * Author:        George Nicolaou
  * Author URI:    https://www.georgenicolaou.me/
  * Text Domain:   gn-custom-order-status
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 define( 'GNCUSTOMOR_NAME',			'GN Custom Order Status' );
 
 // Plugin version
-define( 'GNCUSTOMOR_VERSION',		'1.0.1' );
+define( 'GNCUSTOMOR_VERSION',		'1.0.2' );
 
 // Plugin Root File
 define( 'GNCUSTOMOR_PLUGIN_FILE',	__FILE__ );
@@ -120,13 +120,6 @@ add_filter( 'wc_order_statuses', 'gncy_add_custom_order_status_to_dropdown' );
 function gncy_change_woocommerce_strings_emails( $translated, $untranslated, $domain ) {
    if ( 'woocommerce' === $domain ) {   
       
-	  $translated = str_ireplace( '<p>Hold onto your excitement because your order is officially in transit to you! 🎉</p>
-	  <p>If your shipping includes a tracking number, find it below to follow your order\'s journey to your door.</p>
-	  <p>Now, let\'s address the elephant in the room - delays. Sometimes, despite our best efforts, orders like to take unexpected detours. But rest assured, your order will arrive eventually. We promise it\'s not plotting a grand escape 😋</p>
-	  <p>Kindly be aware that we operate multiple warehouses strategically located to improve efficiency and shipping times. Rest assured, your order will be dispatched from the most suitable warehouse at that specific moment.</p>
-	  <p>Please don’t hesitate to reach out to us at support@planetofgadgets.com, and we’ll do our utmost to resolve any concerns promptly and ensure you have a positive shopping experience with us. Your happiness is our priority.</p>
-	  <p>We greatly appreciate your trust in us. Your order is en route, and we can\'t wait for you to welcome it with open arms.</p>', 'test', $untranslated ); // EDIT
-
 	  $translated = str_ireplace( 'We have finished processing your order.', 'Your order has been delivered', $untranslated ); // EDIT
    }
 
@@ -134,24 +127,54 @@ function gncy_change_woocommerce_strings_emails( $translated, $untranslated, $do
    return $translated;
 }
 
+function gncy_add_content_delivered_email( $order, $sent_to_admin, $plain_text, $email ) {
+    if ( $email->id == 'customer_processing_order' && $order->get_status() == "processing" ) {
+        // Customize content for "Processing" status
+        echo "<p>Your order is currently in the processing phase, and we're working diligently to get it ready for its journey to your doorstep.</p>
+        <p>Here's the deal: It usually takes about 2-4 days for us to receive the tracking number from our warehouse, so we kindly ask for your patience on that front 😁</p>
+        <p>But don't worry, your order is in excellent hands! Once it's on its way, you'll get an email from us with all the tracking info you need.</p>
+        <p>We can't wait to bring your order to your doorstep with a smile 😋</p>";
+    }
 
+    if( $email->id == 'customer_completed_order' && $order->get_status() == "completed" ){
+        echo "<p>Hold onto your excitement because your order is officially in transit to you! 🎉</p>
+        <p>We've dropped your tracking information just below this message, so you can keep a close eye on your order's journey to your door.</p>
+        <p>Now, let's address the elephant in the room - delays. Sometimes, despite our best efforts, orders like to take unexpected detours. But rest assured, your order will arrive eventually. We promise it's not plotting a grand escape 😋</p>
+        <p>Kindly be aware that we operate multiple warehouses strategically located to improve efficiency and shipping times. Rest assured, your order will be dispatched from the most suitable warehouse at that specific moment.</p>
+        <p>Please don’t hesitate to reach out to us at support@dev.georgenicolaou.me, and we’ll do our utmost to resolve any concerns promptly and ensure you have a positive shopping experience with us. Your happiness is our priority.</p>
+        <p>We greatly appreciate your trust in us. Your order is en route, and we can't wait for you to welcome it with open arms.</p>";
+    }
 
-
-//send email notification when order status is changed to delivered with custom email subject and content using a custom email templated based on the completed email notification
-function gncy_send_custom_email_notification( $order_id, $old_status, $new_status ) {
-	if ( $new_status == 'delivered' ) {
-		$order = wc_get_order( $order_id );
-		$wc_emails = WC()->mailer()->get_emails(); // Get all WC_emails objects instances
-		$wc_emails['WC_Email_Customer_Completed_Order']->heading = 'Your order is delivered'; // Changing the email heading
-		$wc_emails['WC_Email_Customer_Completed_Order']->subject = 'Your order is delivered'; // Changing the email subject
-		$wc_emails['WC_Email_Customer_Completed_Order']->settings['heading'] = 'Your order is delivered';
-		$wc_emails['WC_Email_Customer_Completed_Order']->settings['subject'] = 'Your order is delivered';
-		add_filter( 'gettext', 'gncy_change_woocommerce_strings_emails', 9999, 3 );
-		$wc_emails['WC_Email_Customer_Completed_Order']->trigger( $order_id ); // Sending the email
-
-		
+    // For the "Delivered" status
+    if ( $email->id == 'customer_completed_order' && $order->get_status() == "delivered" ) {
+        echo "<p>Test content for delivered orders.</p>";
+    }
 }
+add_action( 'woocommerce_email_before_order_table', 'gncy_add_content_delivered_email', 99999999, 4 );
 
+// Clear initial content of WC_Email_Customer_Completed_Order
+function gncy_clear_completed_order_email_content( $order, $sent_to_admin, $plain_text, $email ) {
+    if ( $email instanceof WC_Email_Customer_Completed_Order ) {
+        echo ''; // Output an empty string to clear the content
+    }
+}
+add_action( 'woocommerce_email_before_order_table', 'gncy_clear_completed_order_email_content', 99999999, 4 );
+
+// Send email notification when order status is changed to delivered
+function gncy_send_custom_email_notification( $order_id, $old_status, $new_status ) {
+    if ( $new_status == 'delivered' ) {
+        $order = wc_get_order( $order_id );
+
+        // Create your custom email content for the 'Delivered' status
+        $wc_emails = WC()->mailer()->get_emails(); // Get all WC_emails objects instances
+        $wc_emails['WC_Email_Customer_Completed_Order']->heading = 'Your order is delivered'; // Changing the email heading
+        $wc_emails['WC_Email_Customer_Completed_Order']->subject = 'Your order is delivered'; // Changing the email subject
+        $wc_emails['WC_Email_Customer_Completed_Order']->settings['heading'] = 'Your order is delivered';
+        $wc_emails['WC_Email_Customer_Completed_Order']->settings['subject'] = 'Your order is delivered';
+		add_filter( 'gettext', 'gncy_change_woocommerce_strings_emails', 20, 3 );
+        // Trigger the email
+        $wc_emails['WC_Email_Customer_Completed_Order']->trigger( $order_id );
+    }
 }
 add_action( 'woocommerce_order_status_changed', 'gncy_send_custom_email_notification', 10, 3 );
 
