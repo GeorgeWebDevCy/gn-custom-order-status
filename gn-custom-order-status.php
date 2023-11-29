@@ -5,13 +5,13 @@
  * @package       GNCUSTOMOR
  * @author        George Nicolaou
  * @license       gplv2
- * @version       1.0.2
+ * @version       1.0.4
  *
  * @wordpress-plugin
  * Plugin Name:   GN Custom Order Status
  * Plugin URI:    https://www.georgenicolaou.me/plugins/gn-custom-order-status
  * Description:   Add custom order status to woocommerce
- * Version:       1.0.2
+ * Version:       1.0.4
  * Author:        George Nicolaou
  * Author URI:    https://www.georgenicolaou.me/
  * Text Domain:   gn-custom-order-status
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 define( 'GNCUSTOMOR_NAME',			'GN Custom Order Status' );
 
 // Plugin version
-define( 'GNCUSTOMOR_VERSION',		'1.0.2' );
+define( 'GNCUSTOMOR_VERSION',		'1.0.4' );
 
 // Plugin Root File
 define( 'GNCUSTOMOR_PLUGIN_FILE',	__FILE__ );
@@ -147,7 +147,13 @@ function gncy_add_content_delivered_email( $order, $sent_to_admin, $plain_text, 
 
     // For the "Delivered" status
     if ( $email->id == 'customer_completed_order' && $order->get_status() == "delivered" ) {
-        echo "<p>Test content for delivered orders.</p>";
+        echo "<p>We're excited to inform you that your recent order from Planet of Gadgets has been successfully delivered to your doorstep.</p>
+        <p>We value your feedback and would love to hear about your experience with our products. Your opinion not only helps us improve our services but also helps other people too.</p>
+        <p>Please take a moment to share your thoughts by clicking on the following link:</p>
+        <p>https://planetofgadgets.com/my-account/orders</p>
+        <p>Once there, find your order, click on the product and scroll down to the bottom of the page where you'll find the review section.</p>
+        <p>As a token of our appreciation, we're offering you a 5% discount on your next purchase when you leave a review.</p>
+        <p>Thank you again for choosing Planet of Gadgets. We look forward to hearing from you and serving you again in the future.</p>";
     }
 }
 add_action( 'woocommerce_email_before_order_table', 'gncy_add_content_delivered_email', 99999999, 4 );
@@ -168,9 +174,9 @@ function gncy_send_custom_email_notification( $order_id, $old_status, $new_statu
         // Create your custom email content for the 'Delivered' status
         $wc_emails = WC()->mailer()->get_emails(); // Get all WC_emails objects instances
         $wc_emails['WC_Email_Customer_Completed_Order']->heading = 'Your order is delivered'; // Changing the email heading
-        $wc_emails['WC_Email_Customer_Completed_Order']->subject = 'Your order is delivered'; // Changing the email subject
+        $wc_emails['WC_Email_Customer_Completed_Order']->subject = ' Order Delivered! Enjoy a Special Gift for Your Review'; // Changing the email subject
         $wc_emails['WC_Email_Customer_Completed_Order']->settings['heading'] = 'Your order is delivered';
-        $wc_emails['WC_Email_Customer_Completed_Order']->settings['subject'] = 'Your order is delivered';
+        $wc_emails['WC_Email_Customer_Completed_Order']->settings['subject'] = ' Order Delivered! Enjoy a Special Gift for Your Review';
 		add_filter( 'gettext', 'gncy_change_woocommerce_strings_emails', 20, 3 );
         // Trigger the email
         $wc_emails['WC_Email_Customer_Completed_Order']->trigger( $order_id );
